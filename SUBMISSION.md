@@ -27,11 +27,11 @@ UUID 来自 `local-seekdb/instance/run/telemetry.json` 的 `content.id`。不要
 
 ## Fork 与 PR
 
-原有真实 Fork：https://github.com/myclms/seekdb
+提测“Fork 仓库地址”：https://github.com/myclms/3zgl_pw
 
 报名仓库必须保留为：https://github.com/myclms/3zgl_pw
 
-原 `3zgl_pw` 是独立仓库，尚未加入官方 Fork 网络。已获授权保留报名地址：备份原仓库，再将真正的官方 Fork 改名为 `3zgl_pw`，并保留现有提交与材料。改名完成后应在“Fork 仓库地址”中填写新的完整 HTTPS 地址。
+已按授权完成仓库改名：原独立仓库完整备份到 https://github.com/myclms/3zgl_pw-backup-20261027 ，真正的官方 Fork 使用 `myclms/3zgl_pw`。报名地址保持原值。原仓库稳定 ID 为 `1406772094`，现报名 Fork 稳定 ID 为 `1434365923`，父仓库确认为 `oceanbase/seekdb`。
 
 修复分支：`codex/fix-ddl-identifier-escaping`。
 
@@ -39,6 +39,8 @@ UUID 来自 `local-seekdb/instance/run/telemetry.json` 的 `content.id`。不要
 
 关联 Issue：https://github.com/oceanbase/seekdb/issues/1469
 
-正式 PR 尚未创建。仓库改名完成后，从上述报名仓库的修复分支向 `oceanbase/seekdb:master` 发起 PR，并填写比赛平台要求的官方 PR 完整地址。
+提测“PR 链接”：https://github.com/oceanbase/seekdb/pull/1897
 
-PR 草稿和测试边界见 `validation/PR_DESCRIPTION.md`。完整修复后的数据库编译和 mysqltest 运行仍待 CI 验证。
+PR 已创建，状态为 open，目标为 `oceanbase/seekdb:master`，来源为 `myclms/3zgl_pw:codex/fix-ddl-identifier-escaping`。GitHub 确认无合并冲突；尚未合并。赛题按已提交核验，不要求等待合并。
+
+PR 正文和测试边界见 `validation/PR_DESCRIPTION.md`。完整修复后的数据库编译和 mysqltest 运行仍待 CI 验证。平台提测和最终得分需另行核验，不能仅凭 PR 已创建认定通过。

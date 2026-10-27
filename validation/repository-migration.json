@@ -1,0 +1,14 @@
+{
+  "backup_repository": "myclms/3zgl_pw-backup-20261027",
+  "backup_repository_id": 1406772094,
+  "registered_repository": "myclms/3zgl_pw",
+  "registered_repository_id": 1434365923,
+  "registered_repository_is_fork": true,
+  "parent_repository": "oceanbase/seekdb",
+  "pull_request": "https://github.com/oceanbase/seekdb/pull/1897",
+  "pull_request_source_repository": "myclms/3zgl_pw",
+  "pull_request_target_repository": "oceanbase/seekdb",
+  "pull_request_head": "1bddd3c03e1a9f982930d760d15fd33bf82f66dd",
+  "pull_request_state": "open",
+  "merge_conflicts": false
+}
