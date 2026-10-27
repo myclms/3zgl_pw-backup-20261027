@@ -1,0 +1,4 @@
+.work/
+local-seekdb/
+__pycache__/
+*.pyc

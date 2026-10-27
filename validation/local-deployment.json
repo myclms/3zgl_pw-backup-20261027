@@ -1,0 +1,10 @@
+{
+  "version": "5.7.25-OceanBase seekdb-v1.4.0.0",
+  "sql_1_plus_1": 2,
+  "deployment_uuid": "5180782a-af0c-8662-aaf5-de5101f0e12b",
+  "telemetry_sent": true,
+  "memory_budget": "1G",
+  "log_disk_size": "2G",
+  "endpoint": "loopback TCP; read local-seekdb/endpoint.json for the current port",
+  "runtime_sha256": "3a50225198ac67f26f1777dd02cd6a5357ceb0a7ed33fa78db05a2e7a33af295"
+}

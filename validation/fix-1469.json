@@ -1,0 +1,12 @@
+{
+  "issue": "https://github.com/oceanbase/seekdb/issues/1469",
+  "base_commit": "4b28bcbff0a476b25f2f668c2560a1b77b2095e5",
+  "formatter_cases": 8512,
+  "assertions": 268532,
+  "backtick_cases_different_before_fix": 5472,
+  "compiler": "Zig 0.13.0 clang frontend",
+  "flags": "-std=c++17 -Wall -Wextra -Werror -fsanitize=undefined -fsanitize-trap=undefined",
+  "scope": "Actual production formatter bodies compiled with minimal ObString/ObSqlString adapters. This is not a full seekdb build.",
+  "full_engine_build": "not run",
+  "mysqltest": "added; patched-engine execution pending"
+}

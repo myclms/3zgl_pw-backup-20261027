@@ -1,0 +1,152 @@
+diff --git a/src/share/ob_ddl_common.cpp b/src/share/ob_ddl_common.cpp
+index 5673e46..2887178 100644
+--- a/src/share/ob_ddl_common.cpp
++++ b/src/share/ob_ddl_common.cpp
+@@ -518,6 +518,37 @@ int ObDDLUtil::refresh_alter_table_arg(ObMultiVersionSchemaService &schema_servi
+   return ret;
+ }
+ 
++// Keep identifier quoting in share: DDL must not depend on the SQL module.
++static int append_ddl_column_identifier(
++    const ObString &column_name, const bool is_shadow, ObSqlString &sql_string)
++{
++  int ret = OB_SUCCESS;
++  const int64_t name_len = column_name.length();
++  if (OB_UNLIKELY(name_len < 0 || (name_len > 0 && OB_ISNULL(column_name.ptr())))) {
++    ret = OB_INVALID_ARGUMENT;
++  } else if (OB_FAIL(sql_string.append("`"))) {
++  } else if (is_shadow && OB_FAIL(sql_string.append("__SHADOW_"))) {
++  } else {
++    int64_t start = 0;
++    for (int64_t i = 0; OB_SUCC(ret) && i < name_len; ++i) {
++      if ('`' == column_name.ptr()[i]) {
++        // Append through the backtick, then double it inside the quoted name.
++        if (OB_FAIL(sql_string.append(column_name.ptr() + start, i - start + 1))) {
++        } else if (OB_FAIL(sql_string.append("`"))) {
++        }
++        start = i + 1;
++      }
++    }
++    if (OB_SUCC(ret) && start < name_len) {
++      ret = sql_string.append(column_name.ptr() + start, name_len - start);
++    }
++    if (OB_SUCC(ret)) {
++      ret = sql_string.append("`");
++    }
++  }
++  return ret;
++}
++
+ int ObDDLUtil::generate_column_name_str(
+     const common::ObIArray<ObColumnNameInfo> &column_names,
+     const bool with_origin_name,
+@@ -549,7 +580,6 @@ int ObDDLUtil::generate_column_name_str(
+     ObSqlString &sql_string)
+ {
+   int ret = OB_SUCCESS;
+-  const char *split_char = "`";
+   // append comma
+   if (with_comma) {
+     if (OB_FAIL(sql_string.append_fmt(", "))) {
+@@ -557,11 +587,10 @@ int ObDDLUtil::generate_column_name_str(
+   }
+   // append original column name
+   if (OB_SUCC(ret) && with_origin_name) {
+-    if (column_name_info.is_enum_set_need_cast_) {
+-      // Enum and set values are cast to unsigned before being appended to a macro block.
+-      if (OB_FAIL(sql_string.append_fmt("cast(%s%.*s%s as unsigned)", split_char, column_name_info.column_name_.length(), column_name_info.column_name_.ptr(), split_char))) {
+-      }
+-    } else if (OB_FAIL(sql_string.append_fmt("%s%.*s%s", split_char, column_name_info.column_name_.length(), column_name_info.column_name_.ptr(), split_char))) {
++    // Enum and set values are cast to unsigned before being appended to a macro block.
++    if (column_name_info.is_enum_set_need_cast_ && OB_FAIL(sql_string.append("cast("))) {
++    } else if (OB_FAIL(append_ddl_column_identifier(column_name_info.column_name_, false, sql_string))) {
++    } else if (column_name_info.is_enum_set_need_cast_ && OB_FAIL(sql_string.append(" as unsigned)"))) {
+     }
+   }
+   // append AS
+@@ -571,8 +600,7 @@ int ObDDLUtil::generate_column_name_str(
+   }
+   // append alias column name
+   if (OB_SUCC(ret) && with_alias_name) {
+-    if (OB_FAIL(sql_string.append_fmt("%s%s%.*s%s", split_char, column_name_info.is_shadow_column_ ? "__SHADOW_" : "",
+-        column_name_info.column_name_.length(), column_name_info.column_name_.ptr(), split_char))) {
++    if (OB_FAIL(append_ddl_column_identifier(column_name_info.column_name_, column_name_info.is_shadow_column_, sql_string))) {
+     }
+   }
+   return ret;
+diff --git a/tools/deploy/mysql_test/psmalltest.py b/tools/deploy/mysql_test/psmalltest.py
+index 9d03a02..01c2ff1 100644
+--- a/tools/deploy/mysql_test/psmalltest.py
++++ b/tools/deploy/mysql_test/psmalltest.py
+@@ -1,5 +1,6 @@
+ # -*- coding: utf-8 -*-
+ psmall_test=[
++'ddl.ddl_identifier_escaping',
+ 'add',
+ 'aggr_bug200109',
+ 'alias2',
+diff --git a/tools/deploy/mysql_test/test_suite/ddl/r/mysql/ddl_identifier_escaping.result b/tools/deploy/mysql_test/test_suite/ddl/r/mysql/ddl_identifier_escaping.result
+new file mode 100644
+index 0000000..e558762
+--- /dev/null
++++ b/tools/deploy/mysql_test/test_suite/ddl/r/mysql/ddl_identifier_escaping.result
+@@ -0,0 +1,25 @@
++CREATE TABLE ddl_identifier_plain (id INT PRIMARY KEY, status ENUM('active', 'paused'));
++INSERT INTO ddl_identifier_plain VALUES (1, 'active'), (2, 'paused');
++CREATE UNIQUE INDEX uk_plain_control ON ddl_identifier_plain (status);
++SELECT id, status FROM ddl_identifier_plain ORDER BY id;
++id	status
++1	active
++2	paused
++DROP TABLE ddl_identifier_plain;
++CREATE TABLE ddl_identifier_escaping (`p``k` INT PRIMARY KEY, `e``n` ENUM('first', 'second'), `s``t` SET('red', 'blue'), `a````b` ENUM('x', 'y'), `列``名` ENUM('x', 'y'), `status` ENUM('active', 'paused'));
++INSERT INTO ddl_identifier_escaping VALUES (1, 'first', 'red', 'x', 'x', 'active'), (2, 'second', 'blue', 'y', 'y', 'paused'), (3, NULL, NULL, NULL, NULL, NULL), (4, NULL, NULL, NULL, NULL, NULL);
++CREATE UNIQUE INDEX uk_enum ON ddl_identifier_escaping (`e``n`);
++CREATE UNIQUE INDEX uk_set ON ddl_identifier_escaping (`s``t`);
++CREATE UNIQUE INDEX uk_adjacent ON ddl_identifier_escaping (`a````b`);
++CREATE UNIQUE INDEX uk_unicode ON ddl_identifier_escaping (`列``名`);
++CREATE UNIQUE INDEX uk_plain ON ddl_identifier_escaping (`status`);
++SELECT `p``k`, `e``n`, `s``t`, `a````b`, `列``名`, `status` FROM ddl_identifier_escaping ORDER BY `p``k`;
++p`k	e`n	s`t	a``b	列`名	status
++1	first	red	x	x	active
++2	second	blue	y	y	paused
++3	NULL	NULL	NULL	NULL	NULL
++4	NULL	NULL	NULL	NULL	NULL
++SELECT COUNT(DISTINCT index_name) AS built_indexes FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'ddl_identifier_escaping' AND index_name IN ('uk_enum', 'uk_set', 'uk_adjacent', 'uk_unicode', 'uk_plain') AND non_unique = 0;
++built_indexes
++5
++DROP TABLE ddl_identifier_escaping;
+diff --git a/tools/deploy/mysql_test/test_suite/ddl/t/ddl_identifier_escaping.test b/tools/deploy/mysql_test/test_suite/ddl/t/ddl_identifier_escaping.test
+new file mode 100644
+index 0000000..80f905b
+--- /dev/null
++++ b/tools/deploy/mysql_test/test_suite/ddl/t/ddl_identifier_escaping.test
+@@ -0,0 +1,28 @@
++# Regression for #1469: shared DDL quotes identifiers without a SQL dependency.
++--disable_query_log
++SET NAMES utf8mb4;
++--disable_warnings
++DROP TABLE IF EXISTS ddl_identifier_escaping;
++DROP TABLE IF EXISTS ddl_identifier_plain;
++--enable_warnings
++--enable_query_log
++
++CREATE TABLE ddl_identifier_plain (id INT PRIMARY KEY, status ENUM('active', 'paused'));
++INSERT INTO ddl_identifier_plain VALUES (1, 'active'), (2, 'paused');
++CREATE UNIQUE INDEX uk_plain_control ON ddl_identifier_plain (status);
++SELECT id, status FROM ddl_identifier_plain ORDER BY id;
++DROP TABLE ddl_identifier_plain;
++
++CREATE TABLE ddl_identifier_escaping (`p``k` INT PRIMARY KEY, `e``n` ENUM('first', 'second'), `s``t` SET('red', 'blue'), `a````b` ENUM('x', 'y'), `列``名` ENUM('x', 'y'), `status` ENUM('active', 'paused'));
++INSERT INTO ddl_identifier_escaping VALUES (1, 'first', 'red', 'x', 'x', 'active'), (2, 'second', 'blue', 'y', 'y', 'paused'), (3, NULL, NULL, NULL, NULL, NULL), (4, NULL, NULL, NULL, NULL, NULL);
++
++# ENUM/SET backfill generates casts, original names and shadow-PK aliases.
++CREATE UNIQUE INDEX uk_enum ON ddl_identifier_escaping (`e``n`);
++CREATE UNIQUE INDEX uk_set ON ddl_identifier_escaping (`s``t`);
++CREATE UNIQUE INDEX uk_adjacent ON ddl_identifier_escaping (`a````b`);
++CREATE UNIQUE INDEX uk_unicode ON ddl_identifier_escaping (`列``名`);
++CREATE UNIQUE INDEX uk_plain ON ddl_identifier_escaping (`status`);
++
++SELECT `p``k`, `e``n`, `s``t`, `a````b`, `列``名`, `status` FROM ddl_identifier_escaping ORDER BY `p``k`;
++SELECT COUNT(DISTINCT index_name) AS built_indexes FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'ddl_identifier_escaping' AND index_name IN ('uk_enum', 'uk_set', 'uk_adjacent', 'uk_unicode', 'uk_plain') AND non_unique = 0;
++DROP TABLE ddl_identifier_escaping;

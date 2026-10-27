@@ -1,0 +1,101 @@
+{
+  "binary": "official unpatched seekdb 1.4.0.0",
+  "reproduction": [
+    {
+      "sql": "CREATE UNIQUE INDEX uk_plain_control ON ddl_identifier_plain (status)",
+      "success": true
+    },
+    {
+      "sql": "CREATE UNIQUE INDEX uk_enum ON ddl_identifier_escaping (`e``n`)",
+      "success": false,
+      "error_code": 1064,
+      "error": "Parse error"
+    },
+    {
+      "sql": "CREATE UNIQUE INDEX uk_set ON ddl_identifier_escaping (`s``t`)",
+      "success": false,
+      "error_code": 1064,
+      "error": "Parse error"
+    },
+    {
+      "sql": "CREATE UNIQUE INDEX uk_adjacent ON ddl_identifier_escaping (`a````b`)",
+      "success": false,
+      "error_code": 1064,
+      "error": "Parse error"
+    },
+    {
+      "sql": "CREATE UNIQUE INDEX uk_unicode ON ddl_identifier_escaping (`列``名`)",
+      "success": false,
+      "error_code": 1064,
+      "error": "Parse error"
+    },
+    {
+      "sql": "CREATE UNIQUE INDEX uk_plain ON ddl_identifier_escaping (`status`)",
+      "success": false,
+      "error_code": 1064,
+      "error": "Parse error"
+    }
+  ],
+  "control_selects": [
+    {
+      "sql": "SELECT id, status FROM ddl_identifier_plain ORDER BY id",
+      "rows": [
+        [
+          1,
+          "active"
+        ],
+        [
+          2,
+          "paused"
+        ]
+      ]
+    },
+    {
+      "sql": "SELECT `pk`, `en`, `st`, `ab`, `列名`, `status` FROM ddl_identifier_control ORDER BY `pk`",
+      "rows": [
+        [
+          1,
+          "first",
+          "red",
+          "x",
+          "x",
+          "active"
+        ],
+        [
+          2,
+          "second",
+          "blue",
+          "y",
+          "y",
+          "paused"
+        ],
+        [
+          3,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          4,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "sql": "SELECT COUNT(DISTINCT index_name) AS built_indexes FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'ddl_identifier_control' AND index_name IN ('uk_enum', 'uk_set', 'uk_adjacent', 'uk_unicode', 'uk_plain') AND non_unique = 0",
+      "rows": [
+        [
+          5
+        ]
+      ]
+    }
+  ],
+  "memory_budget": "1G",
+  "control_statement_count": 18
+}
