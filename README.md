@@ -2,6 +2,8 @@
 
 2026 OceanBase 数据库大赛基础赛题的部署、贡献和验证记录。
 
+**平台核验已通过：2026-10-27 14:37（北京时间），最新成绩 30/30，成功 3 项、失败 0 项。**
+
 - 本机 seekdb 1.4.0.0 已启动并完成 SQL 验证，部署 UUID：`5180782a-af0c-8662-aaf5-de5101f0e12b`。
 - 已完成官方仓库的真实 Fork：[myclms/3zgl_pw](https://github.com/myclms/3zgl_pw)。
 - 已提交大赛 [Issue #1469](https://github.com/oceanbase/seekdb/issues/1469) 的修复 PR：[oceanbase/seekdb#1897](https://github.com/oceanbase/seekdb/pull/1897)。来源仓库已核验与报名地址一致。

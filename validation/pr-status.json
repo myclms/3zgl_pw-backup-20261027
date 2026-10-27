@@ -11,5 +11,8 @@
     "License header": "awaiting maintainer approval",
     "license/cla": "pending contributor signature"
   },
-  "competition_platform_verification": "pending team verification line and authenticated submission"
+  "competition_platform_verification": "passed: 30/30, 3 succeeded, 0 failed",
+  "team_verification_line": "OB-P:Bcl1kH2tJcwXqfpfmeKkjA",
+  "fork_readme_verification_line_present": true,
+  "pull_request_body_verification_line_present": true
 }

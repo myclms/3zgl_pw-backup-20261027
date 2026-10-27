@@ -1,5 +1,7 @@
 # Issue #1469 验证记录
 
+基础实践题已于 2026-10-27 14:37（北京时间）通过平台核验，30/30，成功 3 项、失败 0 项，记录见 `platform-result.json`。成绩截图仅保存在本机 `platform-result.png`。
+
 修复在共享层逐段引用列名，将名字内部的反引号加倍。普通列名、ENUM/SET 的 unsigned CAST、普通别名和 `__SHADOW_` 别名使用同一引用方式，不引入对 SQL 模块的依赖。
 
 - `issue-1469-reproduction.json`：官方未修复 Windows seekdb 1.4.0.0 上的实际 SQL 复现。5 个特殊列名索引创建均返回 1064；普通列名对照成功。18 条普通列名对照 SQL 的结果通过断言。

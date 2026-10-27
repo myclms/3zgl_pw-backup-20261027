@@ -2,3 +2,4 @@
 local-seekdb/
 __pycache__/
 *.pyc
+validation/platform-result.png
