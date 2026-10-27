@@ -44,3 +44,11 @@ UUID 来自 `local-seekdb/instance/run/telemetry.json` 的 `content.id`。不要
 PR 已创建，状态为 open，目标为 `oceanbase/seekdb:master`，来源为 `myclms/3zgl_pw:codex/fix-ddl-identifier-escaping`。GitHub 确认无合并冲突；尚未合并。赛题按已提交核验，不要求等待合并。
 
 PR 正文和测试边界见 `validation/PR_DESCRIPTION.md`。完整修复后的数据库编译和 mysqltest 运行仍待 CI 验证。平台提测和最终得分需另行核验，不能仅凭 PR 已创建认定通过。
+
+## 本队验证行与平台核验
+
+提测页的最新说明要求先获取“本队验证行”，然后原样、独立一行分别放入公开 Fork 默认分支的 README 和官方 PR 的正文。此说明已允许公开实践材料与私有报名仓库分离，不再要求 PR 来自报名仓库；本次提交仍保留了相同的仓库地址。
+
+本队验证行尚待在登录后的提测表单获取，不能用其他队伍的验证行或自行编造。补齐 README 和 PR 正文后，再向平台提交 UUID、Fork 地址、PR 链接并检查三个子项的实际核验结果。
+
+PR 自动标签和翻译检查已通过。完整 CI 等待维护者批准运行；`license/cla` 仍等待贡献者本人阅读并签署，入口：https://cla-assistant.io/oceanbase/seekdb?pullRequest=1897 。

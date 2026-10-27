@@ -1,0 +1,15 @@
+{
+  "pull_request": "https://github.com/oceanbase/seekdb/pull/1897",
+  "head_sha": "1bddd3c03e1a9f982930d760d15fd33bf82f66dd",
+  "source_repository": "myclms/3zgl_pw",
+  "target_repository": "oceanbase/seekdb",
+  "mergeable": true,
+  "checks": {
+    "community-label": "success",
+    "translate": "success",
+    "SeekDB CI": "awaiting maintainer approval",
+    "License header": "awaiting maintainer approval",
+    "license/cla": "pending contributor signature"
+  },
+  "competition_platform_verification": "pending team verification line and authenticated submission"
+}
